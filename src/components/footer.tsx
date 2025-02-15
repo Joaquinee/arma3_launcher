@@ -31,6 +31,9 @@ export default function Footer() {
   }, []);
 
   const handleUpdate = useCallback(() => {
+    if (isUpdating) {
+      return;
+    }
     setIsUpdating(true);
     window.ipcRenderer.send("download-mods");
   }, [updateLocalStorage]);

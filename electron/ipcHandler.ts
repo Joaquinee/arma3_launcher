@@ -3,17 +3,18 @@ import fs from "fs-extra";
 import Store from "electron-store";
 import Registry from "winreg";
 import path from "node:path";
+import { config } from "../src/config/config";
 
 // Configuration du store avec des valeurs par défaut
 const store = new Store({
   name: "userData",
-  cwd: "unreallife-data",
+  cwd: "arma3-data",
   fileExtension: "json",
 });
 
 const storeModsListClient = new Store({
   name: "modsListClient",
-  cwd: "unreallife-data",
+  cwd: "arma3-data",
   defaults: {
     modsList: [],
   },
@@ -21,7 +22,7 @@ const storeModsListClient = new Store({
 });
 const storeModsListServer = new Store({
   name: "modsListServer",
-  cwd: "unreallife-data",
+  cwd: "arma3-data",
   fileExtension: "json",
 });
 
@@ -38,9 +39,9 @@ async function getArma3PathFromRegistry(): Promise<string | null> {
   });
 }
 
-// Vérifie si le mod UnrealLife est installé
+// Vérifie si le mod Arma 3 est installé
 function isModInstalled(arma3Path: string): boolean {
-  return fs.existsSync(`${arma3Path}\\@unreallife`);
+  return fs.existsSync(`${arma3Path}\\${config.folderModsName}`);
 }
 
 // Vérifie si le chemin d'Arma 3 est valide
@@ -89,7 +90,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
         win,
         modInstalled ? "arma3Path-mod-loaded" : "arma3Path-mod-not-loaded",
         undefined,
-        !modInstalled ? "Mod UnrealLife non installé" : undefined
+        !modInstalled ? `Mod ${config.folderModsName} non installé` : undefined
       );
 
       // Message de première utilisation
@@ -145,15 +146,18 @@ export function setupIpcHandlers(win: BrowserWindow) {
   });
 
   ipcMain.on("download-mods", async () => {
-    console.log("download-mods");
     const arma3Path = store.get("arma3Path") as string | null;
     if (!arma3Path) {
       sendMessage(win, "download-error", undefined, "Chemin Arma 3 non trouvé");
       return;
     }
 
+    // Envoyer le message de début de téléchargement pour verrouiller l'interface
+    sendMessage(win, "download-start");
+    console.log("download-start");
+
     try {
-      const modPath = `${arma3Path}\\@unreallife\\addons`;
+      const modPath = `${arma3Path}\\${config.folderModsName}\\addons`;
 
       // S'assurer que le dossier existe
       await fs.ensureDir(modPath);
@@ -217,9 +221,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
 
         if (!clientMod || clientMod.hash !== serverMod.hash) {
           try {
-            const response = await fetch(
-              `http://82.29.170.30/modsList/${serverMod.name}`
-            );
+            const response = await fetch(`${config.urlMods}/${serverMod.name}`);
 
             if (!response.ok) {
               throw new Error(`Erreur HTTP: ${response.status}`);
@@ -235,6 +237,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
             const reader = response.body?.getReader();
             const chunks = [];
 
+            // eslint-disable-next-line no-constant-condition
             while (true) {
               const { done, value } = (await reader?.read()) || {
                 done: true,
@@ -299,6 +302,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
       sendMessage(win, "arma3Path-mod-loaded", "Jeu prêt à être lancé");
     } catch (error) {
       console.error("Erreur lors du téléchargement des mods:", error);
+      // En cas d'erreur, on envoie aussi download-error pour déverrouiller l'interface
       sendMessage(
         win,
         "download-error",
@@ -313,15 +317,13 @@ export function setupIpcHandlers(win: BrowserWindow) {
 async function getUpdateMod(win: BrowserWindow) {
   const arma3Path = store.get("arma3Path") as string | null;
   if (!arma3Path) return false;
-  const modPath = `${arma3Path}\\@unreallife`;
+  const modPath = `${arma3Path}\\${config.folderModsName}`;
   try {
     if (!(await fs.existsSync(modPath))) {
       await fs.mkdir(modPath);
     }
     //Télécharger la derniere liste des mods server
-    const modsListServer = await fetch(
-      "http://82.29.170.30/modsList/modsList.json"
-    );
+    const modsListServer = await fetch(`${config.urlMods}/modsList.json`);
     const modsListServerData = await modsListServer.json();
     storeModsListServer.clear();
     storeModsListServer.set("modsList", modsListServerData);

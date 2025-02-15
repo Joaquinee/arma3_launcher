@@ -695,10 +695,10 @@ function requireSupportsColor() {
       return 3;
     }
     if ("TERM_PROGRAM" in env2) {
-      const version = parseInt((env2.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+      const version2 = parseInt((env2.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
       switch (env2.TERM_PROGRAM) {
         case "iTerm.app":
-          return version >= 3 ? 3 : 2;
+          return version2 >= 3 ? 3 : 2;
         case "Apple_Terminal":
           return 2;
       }
@@ -1604,7 +1604,7 @@ var UuidEncoding;
   UuidEncoding2[UuidEncoding2["BINARY"] = 1] = "BINARY";
   UuidEncoding2[UuidEncoding2["OBJECT"] = 2] = "OBJECT";
 })(UuidEncoding || (UuidEncoding = {}));
-function uuidNamed(name, hashMethod, version, namespace, encoding = UuidEncoding.ASCII) {
+function uuidNamed(name, hashMethod, version2, namespace, encoding = UuidEncoding.ASCII) {
   const hash = (0, crypto_1$1.createHash)(hashMethod);
   const nameIsNotAString = typeof name !== "string";
   if (nameIsNotAString && !Buffer.isBuffer(name)) {
@@ -1616,17 +1616,17 @@ function uuidNamed(name, hashMethod, version, namespace, encoding = UuidEncoding
   let result;
   switch (encoding) {
     case UuidEncoding.BINARY:
-      buffer[6] = buffer[6] & 15 | version;
+      buffer[6] = buffer[6] & 15 | version2;
       buffer[8] = buffer[8] & 63 | 128;
       result = buffer;
       break;
     case UuidEncoding.OBJECT:
-      buffer[6] = buffer[6] & 15 | version;
+      buffer[6] = buffer[6] & 15 | version2;
       buffer[8] = buffer[8] & 63 | 128;
       result = new UUID(buffer);
       break;
     default:
-      result = byte2hex[buffer[0]] + byte2hex[buffer[1]] + byte2hex[buffer[2]] + byte2hex[buffer[3]] + "-" + byte2hex[buffer[4]] + byte2hex[buffer[5]] + "-" + byte2hex[buffer[6] & 15 | version] + byte2hex[buffer[7]] + "-" + byte2hex[buffer[8] & 63 | 128] + byte2hex[buffer[9]] + "-" + byte2hex[buffer[10]] + byte2hex[buffer[11]] + byte2hex[buffer[12]] + byte2hex[buffer[13]] + byte2hex[buffer[14]] + byte2hex[buffer[15]];
+      result = byte2hex[buffer[0]] + byte2hex[buffer[1]] + byte2hex[buffer[2]] + byte2hex[buffer[3]] + "-" + byte2hex[buffer[4]] + byte2hex[buffer[5]] + "-" + byte2hex[buffer[6] & 15 | version2] + byte2hex[buffer[7]] + "-" + byte2hex[buffer[8] & 63 | 128] + byte2hex[buffer[9]] + "-" + byte2hex[buffer[10]] + byte2hex[buffer[11]] + byte2hex[buffer[12]] + byte2hex[buffer[13]] + byte2hex[buffer[14]] + byte2hex[buffer[15]];
       break;
   }
   return result;
@@ -8372,31 +8372,31 @@ const { safeRe: re$1, safeSrc: src, t: t$1 } = reExports;
 const parseOptions = parseOptions_1;
 const { compareIdentifiers } = identifiers$1;
 let SemVer$d = class SemVer {
-  constructor(version, options) {
+  constructor(version2, options) {
     options = parseOptions(options);
-    if (version instanceof SemVer) {
-      if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) {
-        return version;
+    if (version2 instanceof SemVer) {
+      if (version2.loose === !!options.loose && version2.includePrerelease === !!options.includePrerelease) {
+        return version2;
       } else {
-        version = version.version;
+        version2 = version2.version;
       }
-    } else if (typeof version !== "string") {
-      throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`);
+    } else if (typeof version2 !== "string") {
+      throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version2}".`);
     }
-    if (version.length > MAX_LENGTH) {
+    if (version2.length > MAX_LENGTH) {
       throw new TypeError(
         `version is longer than ${MAX_LENGTH} characters`
       );
     }
-    debug("SemVer", version, options);
+    debug("SemVer", version2, options);
     this.options = options;
     this.loose = !!options.loose;
     this.includePrerelease = !!options.includePrerelease;
-    const m = version.trim().match(options.loose ? re$1[t$1.LOOSE] : re$1[t$1.FULL]);
+    const m = version2.trim().match(options.loose ? re$1[t$1.LOOSE] : re$1[t$1.FULL]);
     if (!m) {
-      throw new TypeError(`Invalid Version: ${version}`);
+      throw new TypeError(`Invalid Version: ${version2}`);
     }
-    this.raw = version;
+    this.raw = version2;
     this.major = +m[1];
     this.minor = +m[2];
     this.patch = +m[3];
@@ -8618,12 +8618,12 @@ let SemVer$d = class SemVer {
 };
 var semver$3 = SemVer$d;
 const SemVer$c = semver$3;
-const parse$7 = (version, options, throwErrors = false) => {
-  if (version instanceof SemVer$c) {
-    return version;
+const parse$7 = (version2, options, throwErrors = false) => {
+  if (version2 instanceof SemVer$c) {
+    return version2;
   }
   try {
-    return new SemVer$c(version, options);
+    return new SemVer$c(version2, options);
   } catch (er) {
     if (!throwErrors) {
       return null;
@@ -8633,19 +8633,19 @@ const parse$7 = (version, options, throwErrors = false) => {
 };
 var parse_1 = parse$7;
 const parse$6 = parse_1;
-const valid$2 = (version, options) => {
-  const v = parse$6(version, options);
+const valid$2 = (version2, options) => {
+  const v = parse$6(version2, options);
   return v ? v.version : null;
 };
 var valid_1 = valid$2;
 const parse$5 = parse_1;
-const clean$1 = (version, options) => {
-  const s = parse$5(version.trim().replace(/^[=v]+/, ""), options);
+const clean$1 = (version2, options) => {
+  const s = parse$5(version2.trim().replace(/^[=v]+/, ""), options);
   return s ? s.version : null;
 };
 var clean_1 = clean$1;
 const SemVer$b = semver$3;
-const inc$1 = (version, release, options, identifier, identifierBase) => {
+const inc$1 = (version2, release, options, identifier, identifierBase) => {
   if (typeof options === "string") {
     identifierBase = identifier;
     identifier = options;
@@ -8653,7 +8653,7 @@ const inc$1 = (version, release, options, identifier, identifierBase) => {
   }
   try {
     return new SemVer$b(
-      version instanceof SemVer$b ? version.version : version,
+      version2 instanceof SemVer$b ? version2.version : version2,
       options
     ).inc(release, identifier, identifierBase).version;
   } catch (er) {
@@ -8708,8 +8708,8 @@ const SemVer$8 = semver$3;
 const patch$1 = (a, loose) => new SemVer$8(a, loose).patch;
 var patch_1 = patch$1;
 const parse$3 = parse_1;
-const prerelease$1 = (version, options) => {
-  const parsed = parse$3(version, options);
+const prerelease$1 = (version2, options) => {
+  const parsed = parse$3(version2, options);
   return parsed && parsed.prerelease.length ? parsed.prerelease : null;
 };
 var prerelease_1 = prerelease$1;
@@ -8799,24 +8799,24 @@ var cmp_1 = cmp$1;
 const SemVer$5 = semver$3;
 const parse$2 = parse_1;
 const { safeRe: re, t } = reExports;
-const coerce$1 = (version, options) => {
-  if (version instanceof SemVer$5) {
-    return version;
+const coerce$1 = (version2, options) => {
+  if (version2 instanceof SemVer$5) {
+    return version2;
   }
-  if (typeof version === "number") {
-    version = String(version);
+  if (typeof version2 === "number") {
+    version2 = String(version2);
   }
-  if (typeof version !== "string") {
+  if (typeof version2 !== "string") {
     return null;
   }
   options = options || {};
   let match = null;
   if (!options.rtl) {
-    match = version.match(options.includePrerelease ? re[t.COERCEFULL] : re[t.COERCE]);
+    match = version2.match(options.includePrerelease ? re[t.COERCEFULL] : re[t.COERCE]);
   } else {
     const coerceRtlRegex = options.includePrerelease ? re[t.COERCERTLFULL] : re[t.COERCERTL];
     let next2;
-    while ((next2 = coerceRtlRegex.exec(version)) && (!match || match.index + match[0].length !== version.length)) {
+    while ((next2 = coerceRtlRegex.exec(version2)) && (!match || match.index + match[0].length !== version2.length)) {
       if (!match || next2.index + next2[0].length !== match.index + match[0].length) {
         match = next2;
       }
@@ -8991,19 +8991,19 @@ function requireRange() {
       });
     }
     // if ANY of the sets match ALL of its comparators, then pass
-    test(version) {
-      if (!version) {
+    test(version2) {
+      if (!version2) {
         return false;
       }
-      if (typeof version === "string") {
+      if (typeof version2 === "string") {
         try {
-          version = new SemVer3(version, this.options);
+          version2 = new SemVer3(version2, this.options);
         } catch (er) {
           return false;
         }
       }
       for (let i = 0; i < this.set.length; i++) {
-        if (testSet(this.set[i], version, this.options)) {
+        if (testSet(this.set[i], version2, this.options)) {
           return true;
         }
       }
@@ -9217,13 +9217,13 @@ function requireRange() {
     }
     return `${from} ${to}`.trim();
   };
-  const testSet = (set3, version, options) => {
+  const testSet = (set3, version2, options) => {
     for (let i = 0; i < set3.length; i++) {
-      if (!set3[i].test(version)) {
+      if (!set3[i].test(version2)) {
         return false;
       }
     }
-    if (version.prerelease.length && !options.includePrerelease) {
+    if (version2.prerelease.length && !options.includePrerelease) {
       for (let i = 0; i < set3.length; i++) {
         debug2(set3[i].semver);
         if (set3[i].semver === Comparator2.ANY) {
@@ -9231,7 +9231,7 @@ function requireRange() {
         }
         if (set3[i].semver.prerelease.length > 0) {
           const allowed = set3[i].semver;
-          if (allowed.major === version.major && allowed.minor === version.minor && allowed.patch === version.patch) {
+          if (allowed.major === version2.major && allowed.minor === version2.minor && allowed.patch === version2.patch) {
             return true;
           }
         }
@@ -9292,19 +9292,19 @@ function requireComparator() {
     toString() {
       return this.value;
     }
-    test(version) {
-      debug2("Comparator.test", version, this.options.loose);
-      if (this.semver === ANY2 || version === ANY2) {
+    test(version2) {
+      debug2("Comparator.test", version2, this.options.loose);
+      if (this.semver === ANY2 || version2 === ANY2) {
         return true;
       }
-      if (typeof version === "string") {
+      if (typeof version2 === "string") {
         try {
-          version = new SemVer3(version, this.options);
+          version2 = new SemVer3(version2, this.options);
         } catch (er) {
           return false;
         }
       }
-      return cmp2(version, this.operator, this.semver, this.options);
+      return cmp2(version2, this.operator, this.semver, this.options);
     }
     intersects(comp, options) {
       if (!(comp instanceof Comparator2)) {
@@ -9356,13 +9356,13 @@ function requireComparator() {
   return comparator;
 }
 const Range$9 = requireRange();
-const satisfies$4 = (version, range2, options) => {
+const satisfies$4 = (version2, range2, options) => {
   try {
     range2 = new Range$9(range2, options);
   } catch (er) {
     return false;
   }
-  return range2.test(version);
+  return range2.test(version2);
 };
 var satisfies_1 = satisfies$4;
 const Range$8 = requireRange();
@@ -9480,8 +9480,8 @@ const gt$1 = gt_1;
 const lt$1 = lt_1;
 const lte$1 = lte_1;
 const gte$1 = gte_1;
-const outside$3 = (version, range2, hilo, options) => {
-  version = new SemVer$1(version, options);
+const outside$3 = (version2, range2, hilo, options) => {
+  version2 = new SemVer$1(version2, options);
   range2 = new Range$3(range2, options);
   let gtfn, ltefn, ltfn, comp, ecomp;
   switch (hilo) {
@@ -9502,7 +9502,7 @@ const outside$3 = (version, range2, hilo, options) => {
     default:
       throw new TypeError('Must provide a hilo val of "<" or ">"');
   }
-  if (satisfies$3(version, range2, options)) {
+  if (satisfies$3(version2, range2, options)) {
     return false;
   }
   for (let i = 0; i < range2.set.length; ++i) {
@@ -9524,9 +9524,9 @@ const outside$3 = (version, range2, hilo, options) => {
     if (high.operator === comp || high.operator === ecomp) {
       return false;
     }
-    if ((!low.operator || low.operator === comp) && ltefn(version, low.semver)) {
+    if ((!low.operator || low.operator === comp) && ltefn(version2, low.semver)) {
       return false;
-    } else if (low.operator === ecomp && ltfn(version, low.semver)) {
+    } else if (low.operator === ecomp && ltfn(version2, low.semver)) {
       return false;
     }
   }
@@ -9534,10 +9534,10 @@ const outside$3 = (version, range2, hilo, options) => {
 };
 var outside_1 = outside$3;
 const outside$2 = outside_1;
-const gtr$1 = (version, range2, options) => outside$2(version, range2, ">", options);
+const gtr$1 = (version2, range2, options) => outside$2(version2, range2, ">", options);
 var gtr_1 = gtr$1;
 const outside$1 = outside_1;
-const ltr$1 = (version, range2, options) => outside$1(version, range2, "<", options);
+const ltr$1 = (version2, range2, options) => outside$1(version2, range2, "<", options);
 var ltr_1 = ltr$1;
 const Range$2 = requireRange();
 const intersects$1 = (r1, r2, options) => {
@@ -9553,12 +9553,12 @@ var simplify = (versions, range2, options) => {
   let first = null;
   let prev = null;
   const v = versions.sort((a, b) => compare$2(a, b, options));
-  for (const version of v) {
-    const included = satisfies$2(version, range2, options);
+  for (const version2 of v) {
+    const included = satisfies$2(version2, range2, options);
     if (included) {
-      prev = version;
+      prev = version2;
       if (!first) {
-        first = version;
+        first = version2;
       }
     } else {
       if (prev) {
@@ -11326,11 +11326,11 @@ class PrivateGitHubProvider extends GitHubProvider_1$1.BaseGitHubProvider {
     }
     const url = (0, util_1$v.newUrlFromBase)(basePath, this.baseUrl);
     try {
-      const version = JSON.parse(await this.httpRequest(url, this.configureHeaders("application/vnd.github.v3+json"), cancellationToken));
+      const version2 = JSON.parse(await this.httpRequest(url, this.configureHeaders("application/vnd.github.v3+json"), cancellationToken));
       if (allowPrerelease) {
-        return version.find((it) => it.prerelease) || version[0];
+        return version2.find((it) => it.prerelease) || version2[0];
       } else {
-        return version;
+        return version2;
       }
     } catch (e) {
       throw (0, builder_util_runtime_1$5.newError)(`Unable to find latest version on GitHub (${url}), please ensure a production release exists: ${e.stack || e.message}`, "ERR_UPDATER_LATEST_VERSION_NOT_FOUND");
@@ -12351,7 +12351,7 @@ function requireAppUpdater() {
         return it;
       });
     }
-    static formatDownloadNotification(version, appName, downloadNotification) {
+    static formatDownloadNotification(version2, appName, downloadNotification) {
       if (downloadNotification == null) {
         downloadNotification = {
           title: "A new update is ready to install",
@@ -12359,8 +12359,8 @@ function requireAppUpdater() {
         };
       }
       downloadNotification = {
-        title: downloadNotification.title.replace("{appName}", appName).replace("{version}", version),
-        body: downloadNotification.body.replace("{appName}", appName).replace("{version}", version)
+        title: downloadNotification.title.replace("{appName}", appName).replace("{version}", version2),
+        body: downloadNotification.body.replace("{appName}", appName).replace("{version}", version2)
       };
       return downloadNotification;
     }
@@ -12594,7 +12594,7 @@ function requireAppUpdater() {
         downloadOptions.onProgress = (it) => this.emit(main_1.DOWNLOAD_PROGRESS, it);
       }
       const updateInfo = taskOptions.downloadUpdateOptions.updateInfoAndProvider.info;
-      const version = updateInfo.version;
+      const version2 = updateInfo.version;
       const packageInfo = fileInfo.packageInfo;
       function getCacheUpdateFileName() {
         const urlPath = decodeURIComponent(taskOptions.fileInfo.url.pathname);
@@ -12609,7 +12609,7 @@ function requireAppUpdater() {
       await (0, fs_extra_12.mkdir)(cacheDir, { recursive: true });
       const updateFileName = getCacheUpdateFileName();
       let updateFile = path2.join(cacheDir, updateFileName);
-      const packageFile = packageInfo == null ? null : path2.join(cacheDir, `package-${version}${path2.extname(packageInfo.path) || ".7z"}`);
+      const packageFile = packageInfo == null ? null : path2.join(cacheDir, `package-${version2}${path2.extname(packageInfo.path) || ".7z"}`);
       const done = async (isSaveCache) => {
         await downloadedUpdateHelper.setDownloadedFile(updateFile, packageFile, updateInfo, fileInfo, updateFileName, isSaveCache);
         await taskOptions.done({
@@ -12642,7 +12642,7 @@ function requireAppUpdater() {
         }
         throw e;
       }
-      log.info(`New version ${version} has been downloaded to ${updateFile}`);
+      log.info(`New version ${version2} has been downloaded to ${updateFile}`);
       return await done(true);
     }
     async differentialDownloadInstaller(fileInfo, downloadUpdateOptions, installerPath, provider, oldInstallerFileName) {
@@ -12691,8 +12691,8 @@ function requireAppUpdater() {
     }
   };
   AppUpdater.AppUpdater = AppUpdater$1;
-  function hasPrereleaseComponents(version) {
-    const versionPrereleaseComponent = (0, semver_1.prerelease)(version);
+  function hasPrereleaseComponents(version2) {
+    const versionPrereleaseComponent = (0, semver_1.prerelease)(version2);
     return versionPrereleaseComponent != null && versionPrereleaseComponent.length > 0;
   }
   class NoOpLogger {
@@ -23181,20 +23181,20 @@ class Conf {
     let previousMigratedVersion = this._get(MIGRATION_KEY, "0.0.0");
     const newerVersions = Object.keys(migrations).filter((candidateVersion) => this._shouldPerformMigration(candidateVersion, previousMigratedVersion, versionToMigrate));
     let storeBackup = { ...this.store };
-    for (const version of newerVersions) {
+    for (const version2 of newerVersions) {
       try {
         if (beforeEachMigration) {
           beforeEachMigration(this, {
             fromVersion: previousMigratedVersion,
-            toVersion: version,
+            toVersion: version2,
             finalVersion: versionToMigrate,
             versions: newerVersions
           });
         }
-        const migration = migrations[version];
+        const migration = migrations[version2];
         migration == null ? void 0 : migration(this);
-        this._set(MIGRATION_KEY, version);
-        previousMigratedVersion = version;
+        this._set(MIGRATION_KEY, version2);
+        previousMigratedVersion = version2;
         storeBackup = { ...this.store };
       } catch (error2) {
         this.store = storeBackup;
@@ -23223,8 +23223,8 @@ class Conf {
     }
     return false;
   }
-  _isVersionInRangeFormat(version) {
-    return semver$2.clean(version) === null;
+  _isVersionInRangeFormat(version2) {
+    return semver$2.clean(version2) === null;
   }
   _shouldPerformMigration(candidateVersion, previousMigratedVersion, versionToMigrate) {
     if (this._isVersionInRangeFormat(candidateVersion)) {
@@ -23780,14 +23780,25 @@ Registry.prototype.valueExists = function valueExists(name, cb) {
 };
 var registry = Registry;
 const Registry$1 = /* @__PURE__ */ getDefaultExportFromCjs(registry);
+const version = "2.0.0";
+const config = {
+  version,
+  discord: "https://discord.gg/MonSuperServeur",
+  serverName: `Server Arma 3 - ${version}`,
+  urlMods: "http://82.29.170.30/modsList",
+  serverIp: "127.0.0.1",
+  serverPort: 2302,
+  serverPassword: "password",
+  folderModsName: "@MonSuperMods"
+};
 const store = new ElectronStore({
   name: "userData",
-  cwd: "unreallife-data",
+  cwd: "arma3-data",
   fileExtension: "json"
 });
 const storeModsListClient = new ElectronStore({
   name: "modsListClient",
-  cwd: "unreallife-data",
+  cwd: "arma3-data",
   defaults: {
     modsList: []
   },
@@ -23795,7 +23806,7 @@ const storeModsListClient = new ElectronStore({
 });
 const storeModsListServer = new ElectronStore({
   name: "modsListServer",
-  cwd: "unreallife-data",
+  cwd: "arma3-data",
   fileExtension: "json"
 });
 async function getArma3PathFromRegistry() {
@@ -23810,18 +23821,19 @@ async function getArma3PathFromRegistry() {
   });
 }
 function isModInstalled(arma3Path) {
-  return fs.existsSync(`${arma3Path}\\@unreallife`);
+  return fs.existsSync(`${arma3Path}\\${config.folderModsName}`);
 }
 async function isValidArma3Path(path2) {
   return await fs.pathExists(`${path2}\\arma3.exe`);
 }
-function sendMessage(win2, message, success, error2, data, fileProgress) {
+function sendMessage(win2, message, success, error2, data, fileProgress, timeRemaining) {
   win2 == null ? void 0 : win2.webContents.send("main-process-message", {
     message,
     success,
     error: error2,
     data,
-    fileProgress
+    fileProgress,
+    timeRemaining
   });
 }
 function setupIpcHandlers(win2) {
@@ -23838,7 +23850,7 @@ function setupIpcHandlers(win2) {
         win2,
         modInstalled ? "arma3Path-mod-loaded" : "arma3Path-mod-not-loaded",
         void 0,
-        !modInstalled ? "Mod UnrealLife non installé" : void 0
+        !modInstalled ? `Mod ${config.folderModsName} non installé` : void 0
       );
       if (firstLaunch) {
         sendMessage(
@@ -23887,14 +23899,15 @@ function setupIpcHandlers(win2) {
   });
   ipcMain$1.on("download-mods", async () => {
     var _a;
-    console.log("download-mods");
     const arma3Path = store.get("arma3Path");
     if (!arma3Path) {
       sendMessage(win2, "download-error", void 0, "Chemin Arma 3 non trouvé");
       return;
     }
+    sendMessage(win2, "download-start");
+    console.log("download-start");
     try {
-      const modPath = `${arma3Path}\\@unreallife\\addons`;
+      const modPath = `${arma3Path}\\${config.folderModsName}\\addons`;
       await fs.ensureDir(modPath);
       const modsListServer = storeModsListServer.get("modsList") || [];
       const modsListClient = storeModsListClient.get("modsList") || [];
@@ -23903,6 +23916,7 @@ function setupIpcHandlers(win2) {
       }
       let totalSize = 0;
       let downloadedSize = 0;
+      const startTime = Date.now();
       for (const clientMod of modsListClient) {
         if (!(clientMod == null ? void 0 : clientMod.name)) continue;
         const serverMod = modsListServer.find(
@@ -23931,9 +23945,7 @@ function setupIpcHandlers(win2) {
         );
         if (!clientMod || clientMod.hash !== serverMod.hash) {
           try {
-            const response = await fetch(
-              `http://82.29.170.30/modsList/${serverMod.name}`
-            );
+            const response = await fetch(`${config.urlMods}/${serverMod.name}`);
             if (!response.ok) {
               throw new Error(`Erreur HTTP: ${response.status}`);
             }
@@ -23951,9 +23963,19 @@ function setupIpcHandlers(win2) {
               if (done) break;
               chunks.push(value);
               downloadedFileSize += (value == null ? void 0 : value.length) || 0;
+              downloadedSize += (value == null ? void 0 : value.length) || 0;
               const fileProgress = Math.round(
                 downloadedFileSize / totalFileSize * 100
               );
+              const elapsedTime = (Date.now() - startTime) / 1e3;
+              const downloadSpeed = downloadedSize / elapsedTime;
+              const remainingSize = totalSize - downloadedSize;
+              const estimatedTimeRemaining = Math.round(
+                remainingSize / downloadSpeed
+              );
+              const minutes = Math.floor(estimatedTimeRemaining / 60);
+              const seconds = Math.round(estimatedTimeRemaining % 60);
+              const timeRemaining = `${minutes}m ${seconds}s`;
               const globalProgress = Math.round(
                 downloadedSize / totalSize * 100
               );
@@ -23963,12 +23985,12 @@ function setupIpcHandlers(win2) {
                 globalProgress.toString(),
                 void 0,
                 serverMod.name,
-                fileProgress.toString()
+                fileProgress.toString(),
+                timeRemaining
               );
             }
             const buffer = Buffer.concat(chunks);
             await fs.writeFile(`${modPath}\\${serverMod.name}`, buffer);
-            downloadedSize += serverMod.size;
           } catch (downloadError) {
             console.error(
               `Erreur lors du téléchargement de ${serverMod.name}:`,
@@ -23995,14 +24017,12 @@ function setupIpcHandlers(win2) {
 async function getUpdateMod(win2) {
   const arma3Path = store.get("arma3Path");
   if (!arma3Path) return false;
-  const modPath = `${arma3Path}\\@unreallife`;
+  const modPath = `${arma3Path}\\${config.folderModsName}`;
   try {
     if (!await fs.existsSync(modPath)) {
       await fs.mkdir(modPath);
     }
-    const modsListServer = await fetch(
-      "http://82.29.170.30/modsList/modsList.json"
-    );
+    const modsListServer = await fetch(`${config.urlMods}/modsList.json`);
     const modsListServerData = await modsListServer.json();
     storeModsListServer.clear();
     storeModsListServer.set("modsList", modsListServerData);

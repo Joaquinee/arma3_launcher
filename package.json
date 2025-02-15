@@ -1,11 +1,11 @@
 {
-  "name": "unreallife_launcher",
+  "name": "arma3_launcher",
   "private": false,
   "version": "2.0.0",
   "type": "module",
-  "description": "Launcher pour unrealLife",
+  "description": "Launcher pour Arma 3",
   "author": "Joaquine",
-  "productName": "unrealLife Launcher",
+  "productName": "Arma 3 Launcher",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
@@ -51,7 +51,7 @@
   "main": "dist-electron/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Joaquinee/unreallife.git"
+    "url": "https://github.com/Joaquinee/arma3_launcher.git"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
