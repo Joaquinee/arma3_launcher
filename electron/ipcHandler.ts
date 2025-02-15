@@ -185,6 +185,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
       let totalSize = 0;
       let downloadedSize = 0;
       const startTime = Date.now();
+      let lastProgressUpdate = 0;
 
       // Supprimer les mods qui ne sont plus dans la liste serveur
       for (const clientMod of modsListClient) {
@@ -272,15 +273,21 @@ export function setupIpcHandlers(win: BrowserWindow) {
               const globalProgress = Math.round(
                 (downloadedSize / totalSize) * 100
               );
-              sendMessage(
-                win,
-                "download-progress",
-                globalProgress.toString(),
-                undefined,
-                serverMod.name,
-                fileProgress.toString(),
-                timeRemaining
-              );
+
+              // Limiter la fréquence des messages de progression
+              if (Date.now() - lastProgressUpdate > 1000) {
+                // Mettre à jour toutes les secondes
+                sendMessage(
+                  win,
+                  "download-progress",
+                  globalProgress.toString(),
+                  undefined,
+                  serverMod.name,
+                  fileProgress.toString(),
+                  timeRemaining
+                );
+                lastProgressUpdate = Date.now();
+              }
             }
 
             // Concaténer tous les chunks et écrire le fichier

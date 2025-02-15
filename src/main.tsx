@@ -10,6 +10,27 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   </React.StrictMode>
 );
 
+window.ipcRenderer.on("update-available", () => {
+  toast.success("Mise à jour disponible", {
+    id: "update-available",
+    duration: 5000,
+  });
+});
+
+window.ipcRenderer.on("update-downloaded", () => {
+  toast.success("Mise à jour téléchargée, redémarrage en cours...", {
+    id: "update-downloaded",
+    duration: 5000,
+  });
+});
+
+window.ipcRenderer.on("update-not-available", () => {
+  toast.error("Aucune mise à jour disponible", {
+    id: "update-not-available",
+    duration: 5000,
+  });
+});
+
 //ALL MESSAGES ERROR
 window.ipcRenderer.on("main-process-message", (_event, message) => {
   const commonToastStyle = {

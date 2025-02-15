@@ -180,14 +180,16 @@ export default function Footer() {
           </button>
         )}
 
-        {!requiredPath && (updateModNeeded || !modInstalled) && (
-          <button
-            onClick={handleUpdate}
-            className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
-          >
-            {isUpdating ? "Mise à jour..." : "Mettre à jour"}
-          </button>
-        )}
+        {!requiredPath &&
+          (updateModNeeded || !modInstalled) &&
+          !downloading && (
+            <button
+              onClick={handleUpdate}
+              className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
+            >
+              {isUpdating ? "Mise à jour..." : "Mettre à jour"}
+            </button>
+          )}
 
         {!requiredPath && modInstalled && readyButton && !updateModNeeded && (
           <button

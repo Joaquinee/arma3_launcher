@@ -10,7 +10,6 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { config } from "../config/config";
 export default function Header() {
-  const [isUpdating, setIsUpdating] = useState(false);
   const [locked, setLocked] = useState(false);
   const currentPage = useLocation();
 
@@ -38,20 +37,6 @@ export default function Header() {
     setLocked(false);
   });
 
-  window.ipcRenderer.on("update-available", () => {
-    setIsUpdating(true);
-  });
-
-  if (isUpdating) {
-    return (
-      <div className="bg-[#1A1A1A] text-white">
-        <div className="flex flex-col items-center justify-between px-4 py-2">
-          <span className="text-lg font-medium">{config.serverName}</span>
-          <span className="mt-4">Mise à jour en cours...</span>
-        </div>
-      </div>
-    );
-  }
   const handleMouseDown = (_e: React.MouseEvent) => {
     if (window.electron) {
       window.electron.startDrag();
