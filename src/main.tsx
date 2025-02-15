@@ -57,6 +57,9 @@ window.ipcRenderer.on("main-process-message", (_event, message) => {
     return;
   }
   if (isSuccess) {
+    // Ne pas afficher si le message est juste un nombre
+    if (!isNaN(Number(message.success))) return;
+
     const duration =
       message.message === "updateMod-needed" ? 5000 : commonToastStyle.duration;
     toast.success(message.success, {

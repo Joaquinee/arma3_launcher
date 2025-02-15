@@ -28878,7 +28878,7 @@ Registry.prototype.valueExists = function valueExists(name, cb) {
 };
 var registry = Registry;
 const Registry$1 = /* @__PURE__ */ getDefaultExportFromCjs(registry);
-const version = "2.1.6";
+const version = "2.1.7";
 const config = {
   version,
   maintenance: false,

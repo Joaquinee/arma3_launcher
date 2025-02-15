@@ -14,6 +14,32 @@ export default function App() {
     bytesPerSecond: 0,
   });
   const maintenance = config.maintenance;
+  window.ipcRenderer.on("update-available", () => {
+    setIsUpdating(true);
+  });
+
+  window.ipcRenderer.on("update-progress", (_, data) => {
+    setUpdateProgress(data);
+  });
+
+  if (isUpdating) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-white transition-all duration-500">
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <span className="text-2xl mb-4 animate-pulse">
+            Mise à jour en cours...
+          </span>
+          <div className="w-64 bg-gray-700 rounded-full h-4">
+            <div
+              className="bg-blue-500 h-4 rounded-full transition-all duration-300"
+              style={{ width: `${updateProgress.percent}%` }}
+            ></div>
+          </div>
+          <span className="mt-2">{Math.round(updateProgress.percent)}%</span>
+        </div>
+      </div>
+    );
+  }
 
   if (maintenance) {
     return (
@@ -63,32 +89,6 @@ export default function App() {
           </div>
         </div>
       </>
-    );
-  }
-  window.ipcRenderer.on("update-available", () => {
-    setIsUpdating(true);
-  });
-
-  window.ipcRenderer.on("update-progress", (_, data) => {
-    setUpdateProgress(data);
-  });
-
-  if (isUpdating) {
-    return (
-      <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-white transition-all duration-500">
-        <div className="flex-grow flex flex-col items-center justify-center">
-          <span className="text-2xl mb-4 animate-pulse">
-            Mise à jour en cours...
-          </span>
-          <div className="w-64 bg-gray-700 rounded-full h-4">
-            <div
-              className="bg-blue-500 h-4 rounded-full transition-all duration-300"
-              style={{ width: `${updateProgress.percent}%` }}
-            ></div>
-          </div>
-          <span className="mt-2">{Math.round(updateProgress.percent)}%</span>
-        </div>
-      </div>
     );
   }
 
