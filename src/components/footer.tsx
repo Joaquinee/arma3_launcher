@@ -23,6 +23,7 @@ export default function Footer() {
     initialStates.updateModNeeded
   );
   const [timeRemaining, setTimeRemaining] = useState("");
+  const [downloading, setDownloading] = useState(false);
 
   const updateLocalStorage = useCallback((states: Record<string, boolean>) => {
     Object.entries(states).forEach(([key, value]) => {
@@ -30,13 +31,18 @@ export default function Footer() {
     });
   }, []);
 
+  window.ipcRenderer.on("main-process-message", (_, data) => {
+    if (data.message === "download-start") {
+      setDownloading(true);
+    }
+  });
   const handleUpdate = useCallback(() => {
-    if (isUpdating) {
+    if (downloading) {
       return;
     }
     setIsUpdating(true);
     window.ipcRenderer.send("download-mods");
-  }, [updateLocalStorage]);
+  }, [downloading]);
 
   useEffect(() => {
     const handleMainProcessMessage = (
@@ -108,6 +114,7 @@ export default function Footer() {
           break;
         case "download-complete":
           setIsUpdating(false);
+          setDownloading(false);
           setProgress(0);
           setCurrentFile("");
           setFileProgress(0);
@@ -129,31 +136,31 @@ export default function Footer() {
     window.ipcRenderer.send("locate-arma3");
   };
   return (
-    <div className="top-0 left-0 right-0 bg-[#1A1A1A] h-20 flex justify-between items-center px-5">
+    <div className="relative bg-[#3a3c49] h-20 flex justify-between items-center px-5">
       {/* Zone centrale avec barre de progression */}
       <div className="flex-1 mx-4">
         {isUpdating && (
           <div>
             {currentFile && (
               <>
-                <div className="text-sm text-gray-300 mb-1">
+                <div className="text-sm text-white/80 mb-1">
                   Téléchargement de : {currentFile} ({fileProgress}%)
                 </div>
                 {/* Barre de progression du fichier actuel */}
-                <div className="w-full bg-gray-600 rounded-full h-2 mb-2">
+                <div className="w-full bg-black/25 rounded-full h-2 mb-2">
                   <div
-                    className="bg-green-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-white/80 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${fileProgress}%` }}
                   ></div>
                 </div>
                 {/* Barre de progression globale */}
-                <div className="text-sm text-gray-300 mb-1">
+                <div className="text-sm text-white/80 mb-1">
                   Progression totale : {progress}%{" "}
                   {timeRemaining && `(Temps restant : ${timeRemaining})`}
                 </div>
-                <div className="w-full bg-gray-600 rounded-full h-2">
+                <div className="w-full bg-black/25 rounded-full h-2">
                   <div
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-white/60 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   ></div>
                 </div>
@@ -167,7 +174,7 @@ export default function Footer() {
         {requiredPath && (
           <button
             onClick={handleSelectPath}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded"
+            className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
           >
             Localiser Jeu
           </button>
@@ -176,7 +183,7 @@ export default function Footer() {
         {!requiredPath && (updateModNeeded || !modInstalled) && (
           <button
             onClick={handleUpdate}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded"
+            className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
           >
             {isUpdating ? "Mise à jour..." : "Mettre à jour"}
           </button>
@@ -187,7 +194,7 @@ export default function Footer() {
             onClick={() => {
               // Ajouter ici la logique pour lancer le jeu
             }}
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded"
+            className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
           >
             Jouer
           </button>

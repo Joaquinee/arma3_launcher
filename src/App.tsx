@@ -6,7 +6,7 @@ import Params from "./components/Params";
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-gray-100">
+      <div className="min-h-screen flex flex-col bg-gray-400">
         <Header />
         <Routes>
           <Route path="" element={<Main />} />
