@@ -1,13 +1,14 @@
 // @see - https://www.electron.build/configuration/configuration
 {
   $schema: "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  appId: "com.unreallife.launcher",
+  appId: "com.arma3_launcher.launcher",
   asar: true,
-  productName: "UnrealLife - launcher",
+
+  productName: "arma3_launcher",
   directories: {
     output: "release/${version}",
   },
-  files: ["dist", "dist-electron"],
+  files: ["dist", "dist-electron", "src/images", "src/config"],
   mac: {
     target: ["dmg"],
     artifactName: "${productName}-Mac-${version}-Installer.${ext}",
@@ -20,15 +21,27 @@
       },
     ],
     artifactName: "${productName}-Windows-${version}-Setup.${ext}",
+    icon: "src/images/icon.ico",
   },
   nsis: {
     oneClick: false,
     perMachine: false,
     allowToChangeInstallationDirectory: true,
     deleteAppDataOnUninstall: false,
+    installerIcon: "src/images/icon.ico",
+    uninstallerIcon: "src/images/icon.ico",
+    installerHeaderIcon: "src/images/icon.ico",
   },
   linux: {
     target: ["AppImage"],
     artifactName: "${productName}-Linux-${version}.${ext}",
+    icon: "src/images/icon.png",
+  },
+  publish: {
+    provider: "github",
+    owner: "Joaquinee",
+    repo: "arma3_launcher",
+    releaseType: "release",
+    private: false,
   },
 }
