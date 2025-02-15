@@ -20,7 +20,6 @@
   background: rgba(255, 255, 255, 0.5);
 }
 
-/* S'assurer que la scrollbar se fond avec le fond sombre */
 html {
   scrollbar-color: rgba(255, 255, 255, 0.3) #3a3c49;
   scrollbar-width: thin;

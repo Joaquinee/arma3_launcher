@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { config } from "../config/config";
 
 export default function Footer() {
   // Regrouper les états initiaux
@@ -136,72 +137,78 @@ export default function Footer() {
     window.ipcRenderer.send("locate-arma3");
   };
   return (
-    <div className="relative bg-[#3a3c49] h-20 flex justify-between items-center px-5">
-      {/* Zone centrale avec barre de progression */}
-      <div className="flex-1 mx-4">
-        {isUpdating && (
-          <div>
-            {currentFile && (
-              <>
-                <div className="text-sm text-white/80 mb-1">
-                  Téléchargement de : {currentFile} ({fileProgress}%)
-                </div>
-                {/* Barre de progression du fichier actuel */}
-                <div className="w-full bg-black/25 rounded-full h-2 mb-2">
-                  <div
-                    className="bg-white/80 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${fileProgress}%` }}
-                  ></div>
-                </div>
-                {/* Barre de progression globale */}
-                <div className="text-sm text-white/80 mb-1">
-                  Progression totale : {progress}%{" "}
-                  {timeRemaining && `(Temps restant : ${timeRemaining})`}
-                </div>
-                <div className="w-full bg-black/25 rounded-full h-2">
-                  <div
-                    className="bg-white/60 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </div>
+    <>
+      <div className="relative  h-20 flex justify-between items-center px-5">
+        {/* Zone centrale avec barre de progression */}
+        <div className="flex-1 mx-4">
+          {isUpdating ? (
+            <div>
+              {currentFile && (
+                <>
+                  <div className="text-sm text-white/80 mb-1">
+                    Téléchargement de : {currentFile} ({fileProgress}%)
+                  </div>
+                  {/* Barre de progression du fichier actuel */}
+                  <div className="w-full bg-black/25 rounded-full h-2 mb-2">
+                    <div
+                      className="bg-white/80 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${fileProgress}%` }}
+                    ></div>
+                  </div>
+                  {/* Barre de progression globale */}
+                  <div className="text-sm text-white/80 mb-1">
+                    Progression totale : {progress}%{" "}
+                    {timeRemaining && `(Temps restant : ${timeRemaining})`}
+                  </div>
+                  <div className="w-full bg-black/25 rounded-full h-2">
+                    <div
+                      className="bg-white/60 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <div>
+              <p>Bienvenue sur le serveur {config.serverName}</p>
+            </div>
+          )}
+        </div>
 
-      <div className="flex gap-4">
-        {requiredPath && (
-          <button
-            onClick={handleSelectPath}
-            className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
-          >
-            Localiser Jeu
-          </button>
-        )}
-
-        {!requiredPath &&
-          (updateModNeeded || !modInstalled) &&
-          !downloading && (
+        <div className="flex gap-4">
+          {requiredPath && (
             <button
-              onClick={handleUpdate}
+              onClick={handleSelectPath}
               className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
             >
-              {isUpdating ? "Mise à jour..." : "Mettre à jour"}
+              Localiser Jeu
             </button>
           )}
 
-        {!requiredPath && modInstalled && readyButton && !updateModNeeded && (
-          <button
-            onClick={() => {
-              window.ipcRenderer.invoke("launch-game");
-            }}
-            className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200 cursor-pointer"
-          >
-            Jouer
-          </button>
-        )}
+          {!requiredPath &&
+            (updateModNeeded || !modInstalled) &&
+            !downloading && (
+              <button
+                onClick={handleUpdate}
+                className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
+              >
+                {isUpdating ? "Mise à jour..." : "Mettre à jour"}
+              </button>
+            )}
+
+          {!requiredPath && modInstalled && readyButton && !updateModNeeded && (
+            <button
+              onClick={() => {
+                window.ipcRenderer.invoke("launch-game");
+              }}
+              className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200 cursor-pointer"
+            >
+              Jouer
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

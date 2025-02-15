@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import Footer from "./footer";
+
+import { config } from "../config/config";
 
 // Modification de l'importation des images
 const images = Object.values(
@@ -8,9 +9,18 @@ const images = Object.values(
     eager: true,
   })
 );
+import discord from "../images/sociaux/discord.webp";
+import teamspeak from "../images/sociaux/ts3.webp";
+import website from "../images/sociaux/website.webp";
+import twitch from "../images/sociaux/twitch.webp";
+import youtube from "../images/sociaux/youtube.webp";
 
-// Ajout d'un console.log pour déboguer
-console.log("Images chargées:", images);
+const showSocial =
+  config.discord ||
+  config.teamspeak ||
+  config.website ||
+  config.twitch ||
+  config.youtube;
 
 export default function Main() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -27,7 +37,62 @@ export default function Main() {
 
   return (
     <div className="w-full h-[384px]">
-      <div className="relative h-full bg-[#3a3c49]">
+      <div className="relative h-full bg-[#3a3c49] ">
+        {showSocial && (
+          <div className="absolute top-4 left-4 bottom-4 flex flex-col space-y-2 bg-black/50 rounded-lg p-2 hover:bg-black/70 transition-all duration-200">
+            {config.discord && (
+              <button
+                onClick={() =>
+                  window.ipcRenderer.invoke("open-url", config.discord)
+                }
+                className="text-white p-2 rounded hover:bg-white/10 transition-colors duration-200"
+              >
+                <img src={discord} alt="Discord" className="w-8 h-8" />
+              </button>
+            )}
+            {config.teamspeak && (
+              <button
+                onClick={() =>
+                  window.ipcRenderer.invoke("open-url", config.teamspeak)
+                }
+                className="text-white p-2 rounded hover:bg-white/10 transition-colors duration-200"
+              >
+                <img src={teamspeak} alt="TeamSpeak" className="w-8 h-8" />
+              </button>
+            )}
+            {config.website && (
+              <button
+                onClick={() =>
+                  window.ipcRenderer.invoke("open-url", config.website)
+                }
+                className="text-white p-2 rounded hover:bg-white/10 transition-colors duration-200"
+              >
+                <img src={website} alt="Website" className="w-8 h-8" />
+              </button>
+            )}
+            {config.twitch && (
+              <button
+                onClick={() =>
+                  window.ipcRenderer.invoke("open-url", config.twitch)
+                }
+                className="text-white p-2 rounded hover:bg-white/10 transition-colors duration-200"
+              >
+                <img src={twitch} alt="Twitch" className="w-8 h-8" />
+              </button>
+            )}
+            {config.youtube && (
+              <button
+                onClick={() =>
+                  window.ipcRenderer.invoke("open-url", config.youtube)
+                }
+                className="text-white p-2 rounded hover:bg-white/10 transition-colors duration-200"
+              >
+                <img src={youtube} alt="Youtube" className="w-8 h-8" />
+              </button>
+            )}
+          </div>
+        )}
+
         {images.map((image, index) => (
           <img
             key={index}
@@ -42,21 +107,6 @@ export default function Main() {
             }`}
           />
         ))}
-
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
-          <button className="w-8 h-8 rounded-full bg-black/33 flex items-center justify-center">
-            <Facebook className="w-4 h-4 text-white" />
-          </button>
-          <button className="w-8 h-8 rounded-full bg-black/33 flex items-center justify-center">
-            <Twitter className="w-4 h-4 text-white" />
-          </button>
-          <button className="w-8 h-8 rounded-full bg-black/33 flex items-center justify-center">
-            <Instagram className="w-4 h-4 text-white" />
-          </button>
-          <button className="w-8 h-8 rounded-full bg-black/33 flex items-center justify-center">
-            <Youtube className="w-4 h-4 text-white" />
-          </button>
-        </div>
 
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
           {images.map((_, index) => (

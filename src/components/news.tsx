@@ -14,7 +14,7 @@ const News: React.FC = () => {
   }, []);
 
   return (
-    <article className="news-item p-6 w-full h-[400px] overflow-auto bg-gray-800 shadow-xl rounded-lg">
+    <article className="news-item p-6 w-full h-[400px] overflow-auto  shadow-xl rounded-lg">
       <div className="news-content prose prose-slate max-w-none">
         <ReactMarkdown
           components={{

@@ -9,7 +9,7 @@ var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read fr
 var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var __privateSet = (obj, member, value, setter) => (__accessCheck(obj, member, "write to private field"), setter ? setter.call(obj, value) : member.set(obj, value), value);
 var _validator, _encryptionKey, _options, _defaultValues;
-import require$$1$6, { ipcMain as ipcMain$1, dialog, app as app$1, BrowserWindow } from "electron";
+import require$$1$6, { ipcMain as ipcMain$1, dialog, shell as shell$1, app as app$1, BrowserWindow } from "electron";
 import require$$0$1 from "events";
 import require$$0$3 from "crypto";
 import require$$1$1 from "tty";
@@ -28878,11 +28878,22 @@ Registry.prototype.valueExists = function valueExists(name, cb) {
 };
 var registry = Registry;
 const Registry$1 = /* @__PURE__ */ getDefaultExportFromCjs(registry);
-const version = "2.1.2";
+const version = "2.1.6";
 const config = {
   version,
+  maintenance: false,
   discord: "https://discord.gg/MonSuperServeur",
-  serverName: `Server Arma 3 - ${version}`,
+  //Peut etre vide
+  teamspeak: "ts3server://ts.arma3.fr",
+  //Peut etre vide
+  website: "https://www.google.com",
+  //Peut etre vide
+  twitch: "",
+  //Peut etre vide
+  youtube: "",
+  //Peut etre vide
+  serverName: "Custom Server",
+  title: `Custom Server - ${version}`,
   urlMods: "http://82.29.170.30/modsList",
   urlTFR: "http://82.29.170.30/other/task_force_radio.ts3_plugin",
   mdNews: "http://82.29.170.30/news/news.md",
@@ -29204,6 +29215,9 @@ function setupIpcHandlers(win2) {
     const lastNews = news.get("lastNews");
     if (!lastNews) return null;
     return lastNews;
+  });
+  ipcMain$1.handle("open-url", async (_, url) => {
+    shell$1.openExternal(url);
   });
 }
 async function installTFAR() {

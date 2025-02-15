@@ -73,7 +73,7 @@ export default function Header() {
                     : "hover:bg-[#333333]"
                 } text-white`}
               >
-                Home
+                Accueil
               </Link>
               <Link
                 to="/params"
@@ -83,7 +83,7 @@ export default function Header() {
                     : "hover:bg-[#333333]"
                 } text-white`}
               >
-                Settings
+                Paramètres
               </Link>
               <Link
                 to="/news"
@@ -93,7 +93,7 @@ export default function Header() {
                     : "hover:bg-[#333333]"
                 } text-white`}
               >
-                News
+                Actualités
               </Link>
             </>
           ) : (

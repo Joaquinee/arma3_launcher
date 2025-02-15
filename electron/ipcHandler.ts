@@ -1,4 +1,4 @@
-import { ipcMain, BrowserWindow, dialog } from "electron";
+import { ipcMain, BrowserWindow, dialog, shell } from "electron";
 import fs from "fs-extra";
 import Store from "electron-store";
 import Registry from "winreg";
@@ -426,8 +426,11 @@ export function setupIpcHandlers(win: BrowserWindow) {
     if (!lastNews) return null;
     return lastNews;
   });
-}
 
+  ipcMain.handle("open-url", async (_, url) => {
+    shell.openExternal(url);
+  });
+}
 //Gestionnaire d'installation de TFAR
 async function installTFAR() {
   const tfr = await fetch(`${config.urlTFR}`);
