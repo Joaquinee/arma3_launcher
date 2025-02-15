@@ -1,20 +1,19 @@
-import { useState } from "react";
-
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Facebook, Twitter, Instagram, Youtube } from "lucide-react";
 import Footer from "./footer";
 
+// Modification de l'importation des images
+const images = Object.values(
+  import.meta.glob("../images/slider/*.{png,jpg,jpeg,svg}", {
+    eager: true,
+  })
+);
+
+// Ajout d'un console.log pour déboguer
+console.log("Images chargées:", images);
+
 export default function Main() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  // Liste d'images aléatoires (à remplacer par vos propres images)
-  const images = [
-    "https://picsum.photos/800/400?random=1",
-    "https://picsum.photos/800/400?random=2",
-    "https://picsum.photos/800/400?random=3",
-    "https://picsum.photos/800/400?random=4",
-    "https://picsum.photos/800/400?random=5",
-  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -29,11 +28,20 @@ export default function Main() {
   return (
     <div className="w-full h-[384px]">
       <div className="relative h-full bg-[#3a3c49]">
-        <img
-          src={images[currentImageIndex]}
-          alt={`Image ${currentImageIndex + 1}`}
-          className="w-full h-full object-cover"
-        />
+        {images.map((image, index) => (
+          <img
+            key={index}
+            src={
+              typeof image === "string"
+                ? image
+                : (image as unknown as { default: string }).default
+            }
+            alt={`Image ${index + 1}`}
+            className={`w-full h-full object-cover ${
+              index === currentImageIndex ? "block" : "hidden"
+            }`}
+          />
+        ))}
 
         <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
           <button className="w-8 h-8 rounded-full bg-black/33 flex items-center justify-center">

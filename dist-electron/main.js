@@ -23780,7 +23780,7 @@ Registry.prototype.valueExists = function valueExists(name, cb) {
 };
 var registry = Registry;
 const Registry$1 = /* @__PURE__ */ getDefaultExportFromCjs(registry);
-const version = "2.0.9";
+const version = "2.1.0";
 const config = {
   version,
   discord: "https://discord.gg/MonSuperServeur",
