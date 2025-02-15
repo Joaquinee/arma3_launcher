@@ -31,7 +31,7 @@ export default function Header() {
           className="flex items-center space-x-2"
           style={{ WebkitAppRegion: "drag" }}
         >
-          <span className="text-lg font-medium">Unreallife</span>
+          <span className="text-lg font-medium">Arma 3 Launcher</span>
         </div>
 
         {/* Navigation centrale */}

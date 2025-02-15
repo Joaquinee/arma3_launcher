@@ -22,6 +22,7 @@ export default function Footer() {
   const [updateModNeeded, setUpdateModNeeded] = useState(
     initialStates.updateModNeeded
   );
+  const [timeRemaining, setTimeRemaining] = useState("");
 
   const updateLocalStorage = useCallback((states: Record<string, boolean>) => {
     Object.entries(states).forEach(([key, value]) => {
@@ -43,6 +44,7 @@ export default function Footer() {
         data?: string;
         error?: string;
         fileProgress?: string;
+        timeRemaining?: string;
       }
     ) => {
       switch (message.message) {
@@ -97,6 +99,9 @@ export default function Footer() {
           if (message.fileProgress) {
             setFileProgress(parseInt(message.fileProgress));
           }
+          if (message.timeRemaining) {
+            setTimeRemaining(message.timeRemaining);
+          }
           break;
         case "download-complete":
           setIsUpdating(false);
@@ -140,7 +145,8 @@ export default function Footer() {
                 </div>
                 {/* Barre de progression globale */}
                 <div className="text-sm text-gray-300 mb-1">
-                  Progression totale : {progress}%
+                  Progression totale : {progress}%{" "}
+                  {timeRemaining && `(Temps restant : ${timeRemaining})`}
                 </div>
                 <div className="w-full bg-gray-600 rounded-full h-2">
                   <div

@@ -1,25 +1,13 @@
 import { app, BrowserWindow } from "electron";
-//import { createRequire } from "node:module";
+import { autoUpdater } from "electron-updater";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { setupIpcHandlers } from "./ipcHandler";
 
-//const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// The built directory structure
-//
-// ├─┬─┬ dist
-// │ │ └── index.html
-// │ │
-// │ ├─┬ dist-electron
-// │ │ ├── main.js
-
-// │ │ └── preload.mjs
-// │
 process.env.APP_ROOT = path.join(__dirname, "..");
 
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 export const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
@@ -30,7 +18,51 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 
 let win: BrowserWindow | null;
 
-// Vérification d'instance unique
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+
+autoUpdater.on("update-available", () => {
+  if (win) {
+    win.webContents.send("update-available");
+  }
+});
+
+autoUpdater.on("update-downloaded", () => {
+  if (win) {
+    win.webContents.send("update-ready");
+    setTimeout(() => {
+      autoUpdater.quitAndInstall(false, true);
+    }, 5000);
+  }
+});
+
+autoUpdater.on("error", (err) => {
+  if (win) {
+    win.webContents.send("update-error", err.message);
+  }
+});
+
+autoUpdater.on("checking-for-update", () => {
+  if (win) {
+    win.webContents.send("checking-update");
+  }
+});
+
+autoUpdater.on("update-not-available", () => {
+  if (win) {
+    win.webContents.send("update-not-available");
+  }
+});
+autoUpdater.on("download-progress", (progressObj) => {
+  if (win) {
+    win.webContents.send("update-progress", {
+      percent: progressObj.percent,
+      transferred: progressObj.transferred,
+      total: progressObj.total,
+      bytesPerSecond: progressObj.bytesPerSecond,
+    });
+  }
+});
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
@@ -60,13 +92,16 @@ if (!gotTheLock) {
       },
     });
 
-    // Configurer les gestionnaires IPC
     setupIpcHandlers(win);
+
+    autoUpdater.checkForUpdates().catch(console.error);
 
     if (VITE_DEV_SERVER_URL) {
       win.loadURL(VITE_DEV_SERVER_URL);
+      win.webContents.openDevTools({
+        mode: "detach",
+      });
     } else {
-      // win.loadFile('dist/index.html')
       win.loadFile(path.join(RENDERER_DIST, "index.html"));
     }
   }
@@ -84,5 +119,7 @@ if (!gotTheLock) {
     }
   });
 
-  app.whenReady().then(createWindow);
+  app.whenReady().then(() => {
+    createWindow();
+  });
 }

@@ -42,6 +42,7 @@
     owner: "Joaquinee",
     repo: "arma3_launcher",
     releaseType: "release",
+
     private: false,
   },
 }

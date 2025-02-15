@@ -55,7 +55,8 @@ function sendMessage(
   success?: string,
   error?: string,
   data?: string,
-  fileProgress?: string
+  fileProgress?: string,
+  timeRemaining?: string
 ) {
   win?.webContents.send("main-process-message", {
     message,
@@ -63,6 +64,7 @@ function sendMessage(
     error,
     data,
     fileProgress,
+    timeRemaining,
   });
 }
 
@@ -178,6 +180,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
       // Calculer la taille totale à télécharger
       let totalSize = 0;
       let downloadedSize = 0;
+      const startTime = Date.now();
 
       // Supprimer les mods qui ne sont plus dans la liste serveur
       for (const clientMod of modsListClient) {
@@ -242,11 +245,25 @@ export function setupIpcHandlers(win: BrowserWindow) {
 
               chunks.push(value);
               downloadedFileSize += value?.length || 0;
+              downloadedSize += value?.length || 0;
 
               // Calculer la progression pour ce fichier spécifique
               const fileProgress = Math.round(
                 (downloadedFileSize / totalFileSize) * 100
               );
+
+              // Calculer le temps restant estimé
+              const elapsedTime = (Date.now() - startTime) / 1000; // en secondes
+              const downloadSpeed = downloadedSize / elapsedTime; // octets par seconde
+              const remainingSize = totalSize - downloadedSize;
+              const estimatedTimeRemaining = Math.round(
+                remainingSize / downloadSpeed
+              ); // en secondes
+
+              // Formater le temps restant
+              const minutes = Math.floor(estimatedTimeRemaining / 60);
+              const seconds = Math.round(estimatedTimeRemaining % 60);
+              const timeRemaining = `${minutes}m ${seconds}s`;
 
               // Envoyer la progression globale et la progression du fichier actuel
               const globalProgress = Math.round(
@@ -258,15 +275,14 @@ export function setupIpcHandlers(win: BrowserWindow) {
                 globalProgress.toString(),
                 undefined,
                 serverMod.name,
-                fileProgress.toString()
+                fileProgress.toString(),
+                timeRemaining
               );
             }
 
             // Concaténer tous les chunks et écrire le fichier
             const buffer = Buffer.concat(chunks);
             await fs.writeFile(`${modPath}\\${serverMod.name}`, buffer);
-
-            downloadedSize += serverMod.size;
           } catch (downloadError) {
             console.error(
               `Erreur lors du téléchargement de ${serverMod.name}:`,
