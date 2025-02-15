@@ -4,6 +4,7 @@ import Main from "./components/Main";
 import Params from "./components/Params";
 
 import { useState } from "react";
+import News from "./components/news";
 export default function App() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState({
@@ -47,6 +48,7 @@ export default function App() {
         <Routes>
           <Route path="" element={<Main />} />
           <Route path="params" element={<Params />} />
+          <Route path="news" element={<News />} />
           <Route
             path="*"
             element={

@@ -1,7 +1,7 @@
 {
   "name": "arma_custom_launcher",
   "private": false,
-  "version": "2.1.0",
+  "version": "2.1.2",
   "type": "module",
   "description": "Launcher pour Arma 3",
   "author": "Joaquine",
@@ -14,6 +14,8 @@
     "release": "tsc && vite build && electron-builder --publish always"
   },
   "dependencies": {
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.4",
     "@tailwindcss/vite": "^4.0.6",
     "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^10.0.1",
@@ -24,12 +26,15 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.5.1",
     "react-icons": "^5.4.0",
+    "react-markdown": "^9.0.3",
+    "rehype-highlight": "^7.0.2",
     "tailwindcss": "^4.0.6",
     "update-electron-app": "^3.1.1",
     "winreg": "^1.2.5"
   },
   "devDependencies": {
     "@electron/fuses": "^1.8.0",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/fs-extra": "^11.0.4",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
@@ -46,7 +51,8 @@
     "typescript": "^5.2.2",
     "vite": "^5.1.6",
     "vite-plugin-electron": "^0.28.6",
-    "vite-plugin-electron-renderer": "^0.14.5"
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vite-plugin-markdown": "^2.2.0"
   },
   "main": "dist-electron/main.js",
   "repository": {

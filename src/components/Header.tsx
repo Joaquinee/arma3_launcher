@@ -85,6 +85,16 @@ export default function Header() {
               >
                 Settings
               </Link>
+              <Link
+                to="/news"
+                className={`px-4 py-1 rounded ${
+                  currentPage.pathname === "/news"
+                    ? "bg-[#333333]"
+                    : "hover:bg-[#333333]"
+                } text-white`}
+              >
+                News
+              </Link>
             </>
           ) : (
             <span

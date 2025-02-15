@@ -27,6 +27,12 @@ const storeModsListServer = new Store({
   fileExtension: "json",
 });
 
+const news = new Store({
+  name: "news",
+  cwd: "arma3-data",
+  fileExtension: "md",
+});
+
 // Fonction pour récupérer le chemin d'Arma 3 depuis le registre Windows
 async function getArma3PathFromRegistry(): Promise<string | null> {
   return new Promise((resolve) => {
@@ -81,6 +87,11 @@ export function setupIpcHandlers(win: BrowserWindow) {
   win.webContents.on("did-finish-load", async () => {
     let arma3Path = store.get("arma3Path") as string | null;
     const firstLaunch = store.get("firstLaunch");
+
+    //Last news
+    const lastNews = await fetch(config.mdNews);
+    const lastNewsData = await lastNews.text();
+    news.set("lastNews", lastNewsData);
 
     // Tente de récupérer le chemin depuis le registre si non défini
     if (!arma3Path || arma3Path === "null") {
@@ -408,6 +419,12 @@ export function setupIpcHandlers(win: BrowserWindow) {
     setTimeout(() => {
       win.close();
     }, 5000);
+  });
+
+  ipcMain.handle("get-last-news", async () => {
+    const lastNews = news.get("lastNews") as string | null;
+    if (!lastNews) return null;
+    return lastNews;
   });
 }
 
