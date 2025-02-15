@@ -23,9 +23,11 @@ export default function App() {
 
   if (isUpdating) {
     return (
-      <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-white">
+      <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-white transition-all duration-500">
         <div className="flex-grow flex flex-col items-center justify-center">
-          <span className="text-2xl mb-4">Mise à jour en cours...</span>
+          <span className="text-2xl mb-4 animate-pulse">
+            Mise à jour en cours...
+          </span>
           <div className="w-64 bg-gray-700 rounded-full h-4">
             <div
               className="bg-blue-500 h-4 rounded-full transition-all duration-300"
@@ -40,7 +42,7 @@ export default function App() {
 
   return (
     <Router>
-      <div className="min-h-screen flex flex-col bg-gray-400">
+      <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-white transition-all duration-500">
         <Header />
         <Routes>
           <Route path="" element={<Main />} />
@@ -49,7 +51,7 @@ export default function App() {
             path="*"
             element={
               <div className="flex-grow flex flex-col items-center justify-center">
-                <h1 className="text-4xl font-bold mb-4">404</h1>
+                <h1 className="text-4xl font-bold mb-4 text-red-500">404</h1>
                 <p className="text-xl text-gray-600">Page non trouvée</p>
               </div>
             }

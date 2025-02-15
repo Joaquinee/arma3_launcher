@@ -35,7 +35,6 @@ export default function Main() {
           className="w-full h-full object-cover"
         />
 
-        {/* Boutons de navigation sociale */}
         <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2">
           <button className="w-8 h-8 rounded-full bg-black/33 flex items-center justify-center">
             <Facebook className="w-4 h-4 text-white" />
@@ -51,7 +50,6 @@ export default function Main() {
           </button>
         </div>
 
-        {/* Indicateurs de slide */}
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
           {images.map((_, index) => (
             <button

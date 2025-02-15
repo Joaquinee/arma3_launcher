@@ -11,9 +11,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 
 window.ipcRenderer.on("update-available", () => {
-  toast.success("Mise à jour disponible", {
+  toast("Mise à jour disponible", {
     id: "update-available",
     duration: 5000,
+    icon: "🔄",
   });
 });
 
@@ -25,9 +26,10 @@ window.ipcRenderer.on("update-downloaded", () => {
 });
 
 window.ipcRenderer.on("update-not-available", () => {
-  toast.error("Aucune mise à jour disponible", {
+  toast("Aucune mise à jour disponible", {
     id: "update-not-available",
     duration: 5000,
+    icon: "🔰",
   });
 });
 
@@ -47,49 +49,20 @@ window.ipcRenderer.on("main-process-message", (_event, message) => {
 
   if (!isSuccess && !isError) return;
 
-  switch (message.message) {
-    case "updateMod-needed":
-      toast.success(message.success, {
-        id: "updateMod-needed-success",
-        ...commonToastStyle,
-        duration: 5000,
-      });
-      break;
-    case "arma3Path-invalid":
-      toast.error(message.error, {
-        id: "arma3Path-invalid-error",
-        ...commonToastStyle,
-      });
-      break;
-    case "arma3Path-not-found":
-      toast.error(message.error, {
-        id: "arma3Path-not-found-error",
-        ...commonToastStyle,
-      });
-      break;
-    case "arma3Path-ready":
-      toast.success(message.success, {
-        id: "arma3Path-ready-success",
-        ...commonToastStyle,
-      });
-      break;
-    case "firstLaunch-done":
-      toast.success(message.success, {
-        id: "firstLaunch-done-success",
-        ...commonToastStyle,
-      });
-      break;
-    case "arma3Path-mod-loaded":
-      toast.success(message.success, {
-        id: "arma3Path-mod-loaded-success",
-        ...commonToastStyle,
-      });
-      break;
-    case "arma3Path-mod-not-loaded":
-      toast.error(message.error, {
-        id: "arma3Path-mod-not-loaded-error",
-        ...commonToastStyle,
-      });
-      break;
+  if (isError) {
+    toast.error(message.error, {
+      id: `${message.message}-error`,
+      ...commonToastStyle,
+    });
+    return;
+  }
+  if (isSuccess) {
+    const duration =
+      message.message === "updateMod-needed" ? 5000 : commonToastStyle.duration;
+    toast.success(message.success, {
+      id: `${message.message}-success`,
+      ...commonToastStyle,
+      duration,
+    });
   }
 });

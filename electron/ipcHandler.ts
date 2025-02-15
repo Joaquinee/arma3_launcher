@@ -4,6 +4,7 @@ import Store from "electron-store";
 import Registry from "winreg";
 import path from "node:path";
 import { config } from "../src/config/config";
+import { spawn } from "child_process";
 
 // Configuration du store avec des valeurs par défaut
 const store = new Store({
@@ -47,6 +48,10 @@ function isModInstalled(arma3Path: string): boolean {
 // Vérifie si le chemin d'Arma 3 est valide
 async function isValidArma3Path(path: string): Promise<boolean> {
   return await fs.pathExists(`${path}\\arma3.exe`);
+}
+
+async function isValidTs3Path(path: string): Promise<boolean> {
+  return await fs.pathExists(`${path}\\package_inst.exe`);
 }
 
 // Envoie un message au processus de rendu
@@ -108,7 +113,6 @@ export function setupIpcHandlers(win: BrowserWindow) {
     }
     getUpdateMod(win);
   });
-
   // Gestionnaire de sélection manuelle du dossier Arma 3
   ipcMain.on("locate-arma3", async () => {
     try {
@@ -145,6 +149,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
     }
   });
 
+  //Gestionnaire de téléchargement des mods
   ipcMain.on("download-mods", async () => {
     const arma3Path = store.get("arma3Path") as string | null;
     if (!arma3Path) {
@@ -154,7 +159,6 @@ export function setupIpcHandlers(win: BrowserWindow) {
 
     // Envoyer le message de début de téléchargement pour verrouiller l'interface
     sendMessage(win, "download-start");
-    console.log("download-start");
 
     try {
       const modPath = `${arma3Path}\\${config.folderModsName}\\addons`;
@@ -318,8 +322,116 @@ export function setupIpcHandlers(win: BrowserWindow) {
       );
     }
   });
+
+  //Gestionnaire de récupération du chemin d'Arma 3
+  ipcMain.handle("get-arma3-path", async () => {
+    const arma3Path = store.get("arma3Path") as string | null;
+    if (!arma3Path) return null;
+    return arma3Path;
+  });
+
+  //Gestionnaire de récupération du chemin de TeamSpeak 3
+  ipcMain.handle("locate-ts3", async () => {
+    let ts3Path = store.get("ts3Path") as string | null;
+
+    // Tente de récupérer le chemin depuis le registre si non défini
+    if (!ts3Path || ts3Path === "null") {
+      try {
+        const regKey = new Registry({
+          hive: Registry.HKLM,
+          key: "\\SOFTWARE\\WOW6432Node\\TeamSpeak 3 Client",
+        });
+
+        const value = await new Promise<string | null>((resolve) => {
+          regKey.get("Install_Dir", (err, item) => {
+            resolve(err || !item ? null : item.value);
+          });
+        });
+
+        if (value && (await isValidTs3Path(value))) {
+          ts3Path = value;
+          store.set("ts3Path", value);
+          sendMessage(win, "ts3Path-ready", "TeamSpeak 3 trouvé");
+          await installTFAR();
+          return ts3Path;
+        }
+      } catch (error) {
+        console.error("Erreur lors de la lecture du registre:", error);
+      }
+
+      // Si pas trouvé dans le registre ou chemin invalide, ouvrir un dialog
+      const result = await dialog.showOpenDialog({
+        properties: ["openDirectory"],
+        title: "Sélectionner le dossier d'installation de TeamSpeak 3",
+        defaultPath: "C:\\Program Files\\TeamSpeak 3 Client",
+      });
+
+      if (!result.canceled && result.filePaths.length > 0) {
+        const selectedPath = result.filePaths[0];
+        if (await isValidTs3Path(selectedPath)) {
+          ts3Path = selectedPath;
+          store.set("ts3Path", ts3Path);
+          sendMessage(win, "ts3Path-ready", "TeamSpeak 3 trouvé");
+          await installTFAR();
+        } else {
+          sendMessage(
+            win,
+            "ts3Path-invalid",
+            undefined,
+            "Chemin TeamSpeak 3 invalide"
+          );
+        }
+      }
+    } else {
+      sendMessage(win, "ts3Path-ready", "TeamSpeak 3 trouvé");
+      await installTFAR();
+    }
+
+    return ts3Path;
+  });
+
+  ipcMain.handle("save-params-launch", async (_, paramsLaunch) => {
+    console.log(paramsLaunch);
+  });
+  //Gestionnaire de lancement du jeu
+  ipcMain.handle("launch-game", async () => {
+    const arma3Path = store.get("arma3Path") as string | null;
+    const paramsLaunch = store.get("paramsLaunch") as string | null;
+    if (!arma3Path) return;
+    const arma3PathExe = path.join(arma3Path, "arma3.exe");
+    if (paramsLaunch) {
+      spawn(arma3PathExe, [paramsLaunch]);
+    } else {
+      spawn(arma3PathExe);
+    }
+    sendMessage(win, "launch-game-success", "Jeu lancé avec succès");
+    setTimeout(() => {
+      win.close();
+    }, 5000);
+  });
 }
 
+//Gestionnaire d'installation de TFAR
+async function installTFAR() {
+  const tfr = await fetch(`${config.urlTFR}`);
+  const tfrBuffer = await tfr.arrayBuffer();
+  const tsPath = store.get("ts3Path") as string | null;
+  const arma3Path = store.get("arma3Path") as string;
+  const tfrPath = path.join(
+    arma3Path || "",
+    config.folderModsName,
+    "task_force_radio.ts3_plugin"
+  );
+  if (!tsPath || !arma3Path) return;
+
+  const pathExe = path.join(tsPath, "package_inst.exe");
+  await fs.ensureDir(path.dirname(tfrPath));
+  await fs.writeFile(tfrPath, Buffer.from(tfrBuffer));
+
+  // Import child_process at the top level instead of using require
+
+  spawn(pathExe, [tfrPath]);
+}
 // Gestionnaires d'update
 async function getUpdateMod(win: BrowserWindow) {
   const arma3Path = store.get("arma3Path") as string | null;

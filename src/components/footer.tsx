@@ -194,9 +194,9 @@ export default function Footer() {
         {!requiredPath && modInstalled && readyButton && !updateModNeeded && (
           <button
             onClick={() => {
-              // Ajouter ici la logique pour lancer le jeu
+              window.ipcRenderer.invoke("launch-game");
             }}
-            className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200"
+            className="bg-black/33 hover:bg-black/50 text-white/90 px-6 py-2 rounded transition-colors duration-200 cursor-pointer"
           >
             Jouer
           </button>
