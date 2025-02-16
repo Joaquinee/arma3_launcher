@@ -1,5 +1,6 @@
-# Nom de votre projet
+# Launcher Arma 3
 
-//TODO:
-
-- [ ] State Download
+- [🟢] Auto Aupdate Launcher
+- [🟢] Auto Update Mods
+- [🟢] News
+- [🟢] Install TFR
