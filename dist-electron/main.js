@@ -28878,7 +28878,7 @@ Registry.prototype.valueExists = function valueExists(name, cb) {
 };
 var registry = Registry;
 const Registry$1 = /* @__PURE__ */ getDefaultExportFromCjs(registry);
-const version = "2.1.7";
+const version = "2.1.8";
 const config = {
   version,
   maintenance: false,
@@ -29116,6 +29116,8 @@ function setupIpcHandlers(win2) {
             }
             const buffer = Buffer.concat(chunks);
             await fs.writeFile(`${modPath}\\${serverMod.name}`, buffer);
+            modsListClient.push(serverMod);
+            storeModsListClient.set("modsList", modsListClient);
           } catch (downloadError) {
             console.error(
               `Erreur lors du téléchargement de ${serverMod.name}:`,
@@ -29125,7 +29127,6 @@ function setupIpcHandlers(win2) {
           }
         }
       }
-      storeModsListClient.set("modsList", modsListServer);
       sendMessage(win2, "download-complete", "Mods mis à jour avec succès");
       sendMessage(win2, "arma3Path-mod-loaded", "Jeu prêt à être lancé");
     } catch (error2) {

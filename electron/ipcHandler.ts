@@ -308,6 +308,10 @@ export function setupIpcHandlers(win: BrowserWindow) {
             // Concaténer tous les chunks et écrire le fichier
             const buffer = Buffer.concat(chunks);
             await fs.writeFile(`${modPath}\\${serverMod.name}`, buffer);
+
+            // Ajouter le mod à la liste client
+            modsListClient.push(serverMod);
+            storeModsListClient.set("modsList", modsListClient);
           } catch (downloadError) {
             console.error(
               `Erreur lors du téléchargement de ${serverMod.name}:`,
@@ -319,7 +323,6 @@ export function setupIpcHandlers(win: BrowserWindow) {
       }
 
       // Mettre à jour la liste client
-      storeModsListClient.set("modsList", modsListServer);
       sendMessage(win, "download-complete", "Mods mis à jour avec succès");
       sendMessage(win, "arma3Path-mod-loaded", "Jeu prêt à être lancé");
     } catch (error) {
