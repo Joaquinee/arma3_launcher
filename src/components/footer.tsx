@@ -113,6 +113,20 @@ export default function Footer() {
             setTimeRemaining(message.timeRemaining);
           }
           break;
+        case "download-stop":
+          setIsUpdating(false);
+          setDownloading(false);
+          setProgress(0);
+          setCurrentFile("");
+          setFileProgress(0);
+          setUpdateModNeeded(true);
+          setReadyButton(false);
+          updateLocalStorage({
+            isUpdating: false,
+            updateModNeeded: true,
+            readyButton: false,
+          });
+          break;
         case "download-complete":
           setIsUpdating(false);
           setDownloading(false);

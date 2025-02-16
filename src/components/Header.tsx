@@ -24,6 +24,9 @@ export default function Header() {
     if (data.message === "download-complete") {
       setLocked(false);
     }
+    if (data.message === "download-stop") {
+      setLocked(false);
+    }
     if (data.message === "download-error") {
       setLocked(false);
     }
@@ -98,13 +101,16 @@ export default function Header() {
             </>
           ) : (
             <span
+              onClick={() => {
+                window.ipcRenderer.send("stop-download-mods");
+              }}
               className={`px-4 py-1 rounded ${
                 currentPage.pathname === "/params"
                   ? "bg-[#333333]"
                   : "hover:bg-[#333333]"
-              } text-white`}
+              } text-white cursor-pointer`}
             >
-              Mise à jour en cours
+              Arreter le téléchargement
             </span>
           )}
           <div

@@ -10,9 +10,12 @@ export const config = {
   youtube: "", //Peut etre vide
   serverName: "Custom Server",
   title: `Custom Server - ${version}`,
+
   urlMods: "http://82.29.170.30/modsList",
-  urlTFR: "http://82.29.170.30/other/task_force_radio.ts3_plugin",
+  urlRessources: "http://82.29.170.30/other_ressources",
+
   mdNews: "http://82.29.170.30/news/news.md",
+
   serverIp: "127.0.0.1",
   serverPort: 2302,
   serverPassword: "password",

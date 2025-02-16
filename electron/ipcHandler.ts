@@ -83,7 +83,6 @@ function sendMessage(
 // Gestionnaire de chargement initial
 export function setupIpcHandlers(win: BrowserWindow) {
   // Gestionnaire de chargement initial
-
   win.webContents.on("did-finish-load", async () => {
     let arma3Path = store.get("arma3Path") as string | null;
     const firstLaunch = store.get("firstLaunch");
@@ -124,6 +123,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
     }
     getUpdateMod(win);
   });
+
   // Gestionnaire de sélection manuelle du dossier Arma 3
   ipcMain.on("locate-arma3", async () => {
     try {
@@ -160,6 +160,7 @@ export function setupIpcHandlers(win: BrowserWindow) {
     }
   });
 
+  let shouldStopDownload = false;
   //Gestionnaire de téléchargement des mods
   ipcMain.on("download-mods", async () => {
     const arma3Path = store.get("arma3Path") as string | null;
@@ -167,10 +168,12 @@ export function setupIpcHandlers(win: BrowserWindow) {
       sendMessage(win, "download-error", undefined, "Chemin Arma 3 non trouvé");
       return;
     }
-
+    //Récupérer les DLL et CPP
+    getDLLAndCPP();
     // Envoyer le message de début de téléchargement pour verrouiller l'interface
     sendMessage(win, "download-start");
 
+    if (shouldStopDownload) shouldStopDownload = false;
     try {
       const modPath = `${arma3Path}\\${config.folderModsName}\\addons`;
 
@@ -255,6 +258,10 @@ export function setupIpcHandlers(win: BrowserWindow) {
 
             // eslint-disable-next-line no-constant-condition
             while (true) {
+              if (shouldStopDownload) {
+                return;
+              }
+
               const { done, value } = (await reader?.read()) || {
                 done: true,
                 value: undefined,
@@ -336,14 +343,18 @@ export function setupIpcHandlers(win: BrowserWindow) {
       );
     }
   });
-
+  //Stoper le téléchargement des mods
+  // Comment arrêter le téléchargement des mods
+  ipcMain.on("stop-download-mods", () => {
+    shouldStopDownload = true;
+    sendMessage(win, "download-stop", "Téléchargement arrêté");
+  });
   //Gestionnaire de récupération du chemin d'Arma 3
   ipcMain.handle("get-arma3-path", async () => {
     const arma3Path = store.get("arma3Path") as string | null;
     if (!arma3Path) return null;
     return arma3Path;
   });
-
   //Gestionnaire de récupération du chemin de TeamSpeak 3
   ipcMain.handle("locate-ts3", async () => {
     let ts3Path = store.get("ts3Path") as string | null;
@@ -423,21 +434,19 @@ export function setupIpcHandlers(win: BrowserWindow) {
       win.close();
     }, 5000);
   });
-
+  //Gestionnaire de récupération de la dernière news
   ipcMain.handle("get-last-news", async () => {
     const lastNews = news.get("lastNews") as string | null;
     if (!lastNews) return null;
     return lastNews;
   });
-
+  //Ouvrir un lien dans le navigateur
   ipcMain.handle("open-url", async (_, url) => {
     shell.openExternal(url);
   });
 }
 //Gestionnaire d'installation de TFAR
 async function installTFAR() {
-  const tfr = await fetch(`${config.urlTFR}`);
-  const tfrBuffer = await tfr.arrayBuffer();
   const tsPath = store.get("ts3Path") as string | null;
   const arma3Path = store.get("arma3Path") as string;
   const tfrPath = path.join(
@@ -446,13 +455,7 @@ async function installTFAR() {
     "task_force_radio.ts3_plugin"
   );
   if (!tsPath || !arma3Path) return;
-
   const pathExe = path.join(tsPath, "package_inst.exe");
-  await fs.ensureDir(path.dirname(tfrPath));
-  await fs.writeFile(tfrPath, Buffer.from(tfrBuffer));
-
-  // Import child_process at the top level instead of using require
-
   spawn(pathExe, [tfrPath]);
 }
 // Gestionnaires d'update
@@ -526,6 +529,99 @@ async function getUpdateMod(win: BrowserWindow) {
     return true;
   } catch (error) {
     console.error("Erreur lors de la création du dossier mod:", error);
+    return false;
+  }
+}
+
+async function getDLLAndCPP() {
+  const url = `${config.urlRessources}`;
+  const arma3Path = store.get("arma3Path") as string | null;
+  if (!arma3Path) return false;
+  const modPath = `${arma3Path}\\${config.folderModsName}`;
+
+  try {
+    // Récupérer la liste des fichiers depuis l'URL
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(
+        "Erreur lors de la récupération des ressources:",
+        response.statusText
+      );
+      return false;
+    }
+
+    let ressourcesListServerFinal;
+    try {
+      const textResponse = await response.text();
+      const ressourcesListServer = textResponse
+        .split("\n")
+        .map((line) => {
+          const match = line.match(/href="([^"]+)"/);
+          return match ? { name: match[1], hash: "" } : null;
+        })
+        .filter(
+          (resource) =>
+            resource &&
+            (resource.name.endsWith(".dll") ||
+              resource.name.endsWith(".cpp") ||
+              resource.name.endsWith(".paa"))
+        );
+      ressourcesListServerFinal = ressourcesListServer.filter(
+        (resource) => resource !== null
+      );
+    } catch (error) {
+      console.error("Erreur lors du parsing JSON:", error);
+      return false;
+    }
+
+    // Vérifier que ressourcesListServer est un tableau
+
+    if (!Array.isArray(ressourcesListServerFinal)) {
+      console.error("La réponse n'est pas un tableau valide");
+      return false;
+    }
+
+    // Vérifier et télécharger les fichiers manquants ou modifiés
+    for (const ressource of ressourcesListServerFinal) {
+      const localPath = path.join(modPath, ressource.name);
+
+      // Si le fichier n'existe pas ou le hash est différent
+      if (
+        !fs.existsSync(localPath) ||
+        (fs.existsSync(localPath) &&
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          require("crypto")
+            .createHash("sha256")
+            .update(fs.readFileSync(localPath))
+            .digest("hex") !== ressource.hash)
+      ) {
+        // Télécharger le fichier
+        const fileResponse = await fetch(`${url}/${ressource.name}`);
+        if (!fileResponse.ok) {
+          console.error(`Erreur lors du téléchargement de ${ressource.name}`);
+          continue;
+        }
+        const fileBuffer = await fileResponse
+          .arrayBuffer()
+          .then((buffer) => Buffer.from(buffer));
+        fs.writeFileSync(localPath, fileBuffer);
+      }
+    }
+
+    // Supprimer les fichiers qui ne sont plus sur le serveur
+    const localFiles = fs.readdirSync(modPath);
+    for (const file of localFiles) {
+      if (
+        !ressourcesListServerFinal.find(
+          (r: { name: string }) => r.name === file
+        )
+      ) {
+        fs.unlinkSync(path.join(modPath, file));
+      }
+    }
+
+    return true;
+  } catch (error) {
     return false;
   }
 }

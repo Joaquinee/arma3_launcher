@@ -28878,7 +28878,7 @@ Registry.prototype.valueExists = function valueExists(name, cb) {
 };
 var registry = Registry;
 const Registry$1 = /* @__PURE__ */ getDefaultExportFromCjs(registry);
-const version = "2.1.8";
+const version = "2.1.9";
 const config = {
   version,
   maintenance: false,
@@ -28895,7 +28895,7 @@ const config = {
   serverName: "Custom Server",
   title: `Custom Server - ${version}`,
   urlMods: "http://82.29.170.30/modsList",
-  urlTFR: "http://82.29.170.30/other/task_force_radio.ts3_plugin",
+  urlRessources: "http://82.29.170.30/other_ressources",
   mdNews: "http://82.29.170.30/news/news.md",
   serverIp: "127.0.0.1",
   serverPort: 2302,
@@ -29019,6 +29019,7 @@ function setupIpcHandlers(win2) {
       );
     }
   });
+  let shouldStopDownload = false;
   ipcMain$1.on("download-mods", async () => {
     var _a;
     const arma3Path = store.get("arma3Path");
@@ -29026,7 +29027,9 @@ function setupIpcHandlers(win2) {
       sendMessage(win2, "download-error", void 0, "Chemin Arma 3 non trouvé");
       return;
     }
+    getDLLAndCPP();
     sendMessage(win2, "download-start");
+    if (shouldStopDownload) shouldStopDownload = false;
     try {
       const modPath = `${arma3Path}\\${config.folderModsName}\\addons`;
       await fs.ensureDir(modPath);
@@ -29078,6 +29081,9 @@ function setupIpcHandlers(win2) {
             const reader = (_a = response.body) == null ? void 0 : _a.getReader();
             const chunks = [];
             while (true) {
+              if (shouldStopDownload) {
+                return;
+              }
               const { done, value } = await (reader == null ? void 0 : reader.read()) || {
                 done: true,
                 value: void 0
@@ -29138,6 +29144,10 @@ function setupIpcHandlers(win2) {
         error2 instanceof Error ? error2.message : "Erreur inconnue"
       );
     }
+  });
+  ipcMain$1.on("stop-download-mods", () => {
+    shouldStopDownload = true;
+    sendMessage(win2, "download-stop", "Téléchargement arrêté");
   });
   ipcMain$1.handle("get-arma3-path", async () => {
     const arma3Path = store.get("arma3Path");
@@ -29222,8 +29232,6 @@ function setupIpcHandlers(win2) {
   });
 }
 async function installTFAR() {
-  const tfr = await fetch(`${config.urlTFR}`);
-  const tfrBuffer = await tfr.arrayBuffer();
   const tsPath = store.get("ts3Path");
   const arma3Path = store.get("arma3Path");
   const tfrPath = path$v.join(
@@ -29233,8 +29241,6 @@ async function installTFAR() {
   );
   if (!tsPath || !arma3Path) return;
   const pathExe = path$v.join(tsPath, "package_inst.exe");
-  await fs.ensureDir(path$v.dirname(tfrPath));
-  await fs.writeFile(tfrPath, Buffer.from(tfrBuffer));
   spawn$1(pathExe, [tfrPath]);
 }
 async function getUpdateMod(win2) {
@@ -29289,6 +29295,67 @@ async function getUpdateMod(win2) {
     return true;
   } catch (error2) {
     console.error("Erreur lors de la création du dossier mod:", error2);
+    return false;
+  }
+}
+async function getDLLAndCPP() {
+  const url = `${config.urlRessources}`;
+  const arma3Path = store.get("arma3Path");
+  if (!arma3Path) return false;
+  const modPath = `${arma3Path}\\${config.folderModsName}`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(
+        "Erreur lors de la récupération des ressources:",
+        response.statusText
+      );
+      return false;
+    }
+    let ressourcesListServerFinal;
+    try {
+      const textResponse = await response.text();
+      const ressourcesListServer = textResponse.split("\n").map((line) => {
+        const match = line.match(/href="([^"]+)"/);
+        return match ? { name: match[1], hash: "" } : null;
+      }).filter(
+        (resource) => resource && (resource.name.endsWith(".dll") || resource.name.endsWith(".cpp") || resource.name.endsWith(".paa"))
+      );
+      ressourcesListServerFinal = ressourcesListServer.filter(
+        (resource) => resource !== null
+      );
+    } catch (error2) {
+      console.error("Erreur lors du parsing JSON:", error2);
+      return false;
+    }
+    if (!Array.isArray(ressourcesListServerFinal)) {
+      console.error("La réponse n'est pas un tableau valide");
+      return false;
+    }
+    for (const ressource of ressourcesListServerFinal) {
+      const localPath = path$v.join(modPath, ressource.name);
+      if (!fs.existsSync(localPath) || fs.existsSync(localPath) && // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("crypto").createHash("sha256").update(fs.readFileSync(localPath)).digest("hex") !== ressource.hash) {
+        const fileResponse = await fetch(`${url}/${ressource.name}`);
+        if (!fileResponse.ok) {
+          console.error(`Erreur lors du téléchargement de ${ressource.name}`);
+          continue;
+        }
+        const fileBuffer = await fileResponse.arrayBuffer().then((buffer) => Buffer.from(buffer));
+        fs.writeFileSync(localPath, fileBuffer);
+      }
+    }
+    const localFiles = fs.readdirSync(modPath);
+    for (const file2 of localFiles) {
+      if (!ressourcesListServerFinal.find(
+        (r) => r.name === file2
+      )) {
+        fs.unlinkSync(path$v.join(modPath, file2));
+      }
+    }
+    return true;
+  } catch (error2) {
+    console.error("Erreur lors de la synchronisation des ressources:", error2);
     return false;
   }
 }

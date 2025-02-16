@@ -1,7 +1,7 @@
 {
   "name": "arma_custom_launcher",
   "private": false,
-  "version": "2.1.8",
+  "version": "2.1.9",
   "type": "module",
   "description": "Launcher pour Arma 3",
   "author": "Joaquine",
