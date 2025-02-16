@@ -20,6 +20,10 @@ Dossiers à créer sur le serveur distant :
 - `📁 news` : Contient un fichier .md pour écrire les news
 - `📁 modsList` : Fichier principal où sont les mods à télécharger
 
+## ⚙️ Configuration
+
+La configuration du serveur se fait dans le fichier `src/config/config.ts`.
+
 ## 🚀 Déploiement
 
 - `pnpm release` : Pour envoyer la nouvelle version sur GitHub (Prérequis : avoir un token GitHub dans .env, ainsi que les droits de push sur le repo et remplir les informations dans le fichier `electron-builder.json5`  
